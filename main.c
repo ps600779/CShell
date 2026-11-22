@@ -29,10 +29,21 @@ int getSystemName(char *systemNamef, const size_t size) {
   return 0;
 }
 
+int getCurrentWorkingDirectory(char *currentWorkingDir, const size_t size) {
+  if (getcwd(currentWorkingDir, size) == NULL) {
+    perror("cannot get CWD");
+    return 1;
+  }
+
+  currentWorkingDir[size - 1] = '\0';
+
+  return 0;
+}
+
 int main() {
   char userName[256];
   char systemName[256];
-  char *currentWorkingDir;
+  char currentWorkingDir[1024];
 
   if (getUserName(userName, sizeof(userName))) {
     printf("Unable to get username");
@@ -44,8 +55,14 @@ int main() {
     return 1;
   }
 
-  printf("%s\n", userName);
-  printf("%s\n", systemName);
+  if (getCurrentWorkingDirectory(currentWorkingDir, sizeof currentWorkingDir)) {
+    printf("Unable to get CWD");
+    return 1;
+  }
+
+  printf("UserName: %s\n", userName);
+  printf("SystemName: %s\n", systemName);
+  printf("currentWorkingDir: %s\n", currentWorkingDir);
 
   // systemName = getSystemName();
   // currentWorkingDir = getCurrentWorkingDirectory();
