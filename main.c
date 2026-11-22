@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "parser.h"
 #include "utils.h"
 
 int main(void) {
@@ -56,7 +57,18 @@ int main(void) {
       continue;
     }
 
-    printf("You entered: %s\n", input);
+    Command cmd;
+
+    if (!parseCommand(input, &cmd)) {
+      fprintf(stderr, "Failed to Tokenize the input");
+      continue;
+    }
+
+    for (size_t i = 0; i < cmd.argc; i++) {
+      printf("argv[%zu] = %s\n", i, cmd.argv[i]);
+    }
+
+    freeCommand(&cmd);
   }
 
   free(input);
