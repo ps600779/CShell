@@ -1,44 +1,11 @@
 #include <stddef.h>
 #define _PROGRAM_NAME "whoami"
+#include "utils.h"
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-int getUserName(char *username, const size_t size) {
-  struct passwd *pw = getpwuid(getuid());
-
-  if (!pw)
-    return 1;
-
-  strncpy(username, pw->pw_name, size - 1);
-  username[size - 1] = '\0';
-
-  return 0;
-}
-
-int getSystemName(char *systemNamef, const size_t size) {
-  if (gethostname(systemNamef, size) == -1) {
-    perror("gethostname");
-    return 1;
-  }
-
-  systemNamef[size - 1] = '\0';
-
-  return 0;
-}
-
-int getCurrentWorkingDirectory(char *currentWorkingDir, const size_t size) {
-  if (getcwd(currentWorkingDir, size) == NULL) {
-    perror("cannot get CWD");
-    return 1;
-  }
-
-  currentWorkingDir[size - 1] = '\0';
-
-  return 0;
-}
 
 int main() {
   char userName[256];
@@ -46,26 +13,32 @@ int main() {
   char currentWorkingDir[1024];
 
   if (getUserName(userName, sizeof(userName))) {
-    printf("Unable to get username");
+    fprintf(stderr, "Unable to get username\n");
     return 1;
   }
 
   if (getSystemName(systemName, sizeof(systemName))) {
-    printf("Unable to get systemName");
+    fprintf(stderr, "Unable to get systemName\n");
     return 1;
   }
 
-  if (getCurrentWorkingDirectory(currentWorkingDir, sizeof currentWorkingDir)) {
-    printf("Unable to get CWD");
+  if (getCurrentWorkingDirectory(currentWorkingDir,
+                                 sizeof(currentWorkingDir))) {
+    fprintf(stderr, "Unable to get CWD\n");
     return 1;
   }
 
-  printf("UserName: %s\n", userName);
-  printf("SystemName: %s\n", systemName);
-  printf("currentWorkingDir: %s\n", currentWorkingDir);
+  while (1) {
+    // implement the status message here
+    printf("%s@%s:%s>", userName, systemName, currentWorkingDir);
+    // implement user input
+    char input[100];
+    if (fgets(input, sizeof input, stdin) != NULL) {
+      input[strcspn(input, "\n")] = '\0';
 
-  // systemName = getSystemName();
-  // currentWorkingDir = getCurrentWorkingDirectory();
-
+      printf("You entered : %s\n", input);
+      break;
+    }
+  }
   return 0;
 }

@@ -1,12 +1,16 @@
 # Declare targets that don't produce actual files
 .PHONY: all run clean
 
-all:
-	gcc main.c -o my_program
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c11
 
-run:
+all: my_program
+
+my_program: main.c utils.c utils.h
+	$(CC) $(CFLAGS) main.c utils.c -o my_program
+
+run: my_program
 	./my_program
 
 clean:
 	rm -f my_program
-
