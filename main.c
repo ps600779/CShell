@@ -1,13 +1,15 @@
-#include <stddef.h>
 #define _PROGRAM_NAME "whoami"
-#include "utils.h"
+
 #include <pwd.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-int main() {
+#include "utils.h"
+
+int main(void) {
   char userName[256];
   char systemName[256];
   char currentWorkingDir[1024];
@@ -18,7 +20,7 @@ int main() {
   }
 
   if (getSystemName(systemName, sizeof(systemName))) {
-    fprintf(stderr, "Unable to get systemName\n");
+    fprintf(stderr, "Unable to get system name\n");
     return 1;
   }
 
@@ -28,17 +30,36 @@ int main() {
     return 1;
   }
 
-  while (1) {
-    // implement the status message here
-    printf("%s@%s:%s>", userName, systemName, currentWorkingDir);
-    // implement user input
-    char input[100];
-    if (fgets(input, sizeof input, stdin) != NULL) {
-      input[strcspn(input, "\n")] = '\0';
+  char *input = NULL;
+  size_t inputCapacity = 0;
 
-      printf("You entered : %s\n", input);
+  while (1) {
+
+    // Display shell prompt
+    printf("%s@%s:%s> ", userName, systemName, currentWorkingDir);
+
+    fflush(stdout);
+
+    // Read user input dynamically
+    ssize_t bytesRead = getline(&input, &inputCapacity, stdin);
+
+    // Handle EOF (Ctrl+D) or input error
+    if (bytesRead == -1) {
+      printf("\n");
       break;
     }
+
+    // Remove trailing newline
+    input[strcspn(input, "\n")] = '\0';
+
+    if (strlen(input) == 0) {
+      continue;
+    }
+
+    printf("You entered: %s\n", input);
   }
+
+  free(input);
+
   return 0;
 }
