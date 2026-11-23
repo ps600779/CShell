@@ -1,5 +1,5 @@
 #define _PROGRAM_NAME "whoami"
-
+// this is the comment to chek my github account
 #include <pwd.h>
 #include <stddef.h>
 #include <stdio.h>
