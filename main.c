@@ -10,21 +10,64 @@
 #include "parser.h"
 #include "utils.h"
 
+static char prev_dir[PATH_MAX] = "";
+
+static char home_dir[PATH_MAX] =
+    "/Users/priyanshusharma/Documents/linux/lab/shell";
+
 int cdHandler(Command *cmd) {
   char *path;
-  if (cmd->argc == 1) {
-    path = ".";
-  } else if (cmd->argc == 2) {
-    path = cmd->argv[1];
-  } else {
-    fprintf(stderr, "Too Many Arguments\n");
+  char *home = home_dir;
+
+  if (cmd->argc > 2) {
+    fprintf(stderr, "cd: too many arguments\n");
     return 1;
   }
 
-  if (chdir(path) == 0) {
-
+  // cd -> home
+  if (cmd->argc == 1) {
+    if (home == NULL) {
+      fprintf(stderr, "cd: HOME not set\n");
+      return 1;
+    }
+    path = home;
   } else {
+    path = cmd->argv[1];
   }
+
+  // cd ~
+  if (strcmp(path, "~") == 0) {
+    if (home == NULL) {
+      fprintf(stderr, "cd: Home Not Set\n");
+      return 1;
+    }
+    path = home;
+  }
+  // cd -
+  if (strcmp(path, "-") == 0) {
+    if (prev_dir[0] == '\0') {
+      fprintf(stderr, "cd: OLDPWD not ser\n");
+      return 1;
+    }
+    path = prev_dir;
+  }
+
+  // save the current directory for previous directory
+  char old_dir[PATH_MAX];
+
+  if (getcwd(old_dir, sizeof old_dir) == NULL) {
+    perror("cd: getcwd");
+    return 1;
+  }
+
+  // change ditectories
+  if (chdir(path) == -1) {
+    perror("cd");
+    return 1;
+  }
+
+  // update prev_dir
+  strcpy(prev_dir, old_dir);
 
   return 0;
 }
