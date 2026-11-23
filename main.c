@@ -10,6 +10,25 @@
 #include "parser.h"
 #include "utils.h"
 
+int cdHandler(Command *cmd) {
+  char *path;
+  if (cmd->argc == 1) {
+    path = ".";
+  } else if (cmd->argc == 2) {
+    path = cmd->argv[1];
+  } else {
+    fprintf(stderr, "Too Many Arguments\n");
+    return 1;
+  }
+
+  if (chdir(path) == 0) {
+
+  } else {
+  }
+
+  return 0;
+}
+
 int main(void) {
   char userName[256];
   char systemName[256];
@@ -35,6 +54,11 @@ int main(void) {
   size_t inputCapacity = 0;
 
   while (1) {
+
+    if (getCurrentWorkingDirectory(currentWorkingDir,
+                                   sizeof currentWorkingDir)) {
+      strcpy(currentWorkingDir, "?");
+    }
 
     // Display shell prompt
     printf("%s@%s:%s> ", userName, systemName, currentWorkingDir);
@@ -62,6 +86,12 @@ int main(void) {
     if (!parseCommand(input, &cmd)) {
       fprintf(stderr, "Failed to Tokenize the input");
       continue;
+    }
+
+    if (strcmp(cmd.argv[0], "cd") == 0) {
+      if (cdHandler(&cmd)) {
+        fprintf(stderr, "Could Not cd now !!");
+      }
     }
 
     for (size_t i = 0; i < cmd.argc; i++) {
