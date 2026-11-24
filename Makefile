@@ -4,13 +4,21 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
 
-all: my_program
+TARGET = my_program
+SRCS = main.c utils.c parser.c builtin.c
+OBJS = $(SRCS:.c=.o)
+HEADERS = utils.h parser.h builtins.h
 
-my_program: main.c utils.c utils.h parser.c parser.h
-	$(CC) $(CFLAGS) main.c utils.c parser.c -o my_program
+all: $(TARGET)
 
-run: my_program
-	./my_program
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(TARGET)
+
+%.o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+run: $(TARGET)
+	./$(TARGET)
 
 clean:
-	rm -f my_program
+	rm -f $(TARGET) $(OBJS)

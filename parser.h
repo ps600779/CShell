@@ -1,5 +1,8 @@
+#ifndef PARSER_H
+#define PARSER_H
+
 #include <stddef.h>
-// #include "parser.h"
+
 typedef struct {
   char **argv;
   size_t argc;
@@ -9,3 +12,5 @@ typedef struct {
 int parseCommand(char *input, Command *cmd);
 
 void freeCommand(Command *cmd);
+
+#endif

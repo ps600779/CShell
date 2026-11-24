@@ -9,7 +9,7 @@ static int addArgument(Command *cmd, char *start, size_t length) {
   //
   // grow argv when full(reserve space for null)
 
-  if (cmd->argc + 1 == cmd->capacity) {
+  if (cmd->argc + 1 >= cmd->capacity) {
     size_t newCapacity = cmd->capacity * 2;
 
     char **temp = realloc(cmd->argv, newCapacity * sizeof(char *));
@@ -75,7 +75,7 @@ int parseCommand(char *input, Command *cmd) {
 
     if (!addArgument(cmd, start, length)) {
       freeCommand(cmd);
-      return 1;
+      return 0;
     }
   }
 
@@ -84,14 +84,19 @@ int parseCommand(char *input, Command *cmd) {
 
 // free the allocated memory
 void freeCommand(Command *cmd) {
+  if (cmd == NULL) {
+    return;
+  }
 
-  for (size_t i = 0; i < cmd->argc; i++) {
-    free(cmd->argv[i]);
+  if (cmd->argv != NULL) {
+    for (size_t i = 0; i < cmd->argc; i++) {
+      free(cmd->argv[i]);
+    }
   }
 
   free(cmd->argv);
 
   cmd->argv = NULL;
-  cmd->argv = 0;
+  cmd->argc = 0;
   cmd->capacity = 0;
 }
