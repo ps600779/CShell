@@ -1,6 +1,7 @@
 #include "parser.h"
 
 #include <ctype.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,7 +55,8 @@ int parseCommand(char *input, Command *cmd) {
   char *ptr = input;
 
   while (*ptr != '\0') {
-    // skip whitespaces
+
+    // Skip whitespace between tokens
     while (isspace((unsigned char)*ptr)) {
       ptr++;
     }
@@ -63,20 +65,59 @@ int parseCommand(char *input, Command *cmd) {
       break;
     }
 
-    // mark the start of the token
-    char *start = ptr;
+    // Allocate temporary buffer for the token
+    size_t maxLength = strlen(ptr);
+    char *token = malloc(maxLength + 1);
 
-    // find token end
-    while (*ptr != '\0' && !isspace((unsigned char)*ptr)) {
-      ptr++;
-    }
-
-    size_t length = ptr - start;
-
-    if (!addArgument(cmd, start, length)) {
+    if (token == NULL) {
       freeCommand(cmd);
       return 0;
     }
+
+    size_t j = 0;
+    char quote_char = '\0';
+
+    while (*ptr != '\0') {
+
+      // Handle opening and closing quotes
+      if (*ptr == '"' || *ptr == '\'') {
+
+        if (quote_char == '\0') {
+          quote_char = *ptr;
+          ptr++;
+          continue;
+        } else if (quote_char == *ptr) {
+          quote_char = '\0';
+          ptr++;
+          continue;
+        }
+      }
+
+      // Whitespace ends token only outside quotes
+      if (isspace((unsigned char)*ptr) && quote_char == '\0') {
+        break;
+      }
+
+      token[j++] = *ptr;
+      ptr++;
+    }
+
+    // Unmatched quote detection
+    if (quote_char != '\0') {
+      free(token);
+      freeCommand(cmd);
+      return 0;
+    }
+
+    token[j] = '\0';
+
+    if (!addArgument(cmd, token, j)) {
+      free(token);
+      freeCommand(cmd);
+      return 0;
+    }
+
+    free(token);
   }
 
   return 1;

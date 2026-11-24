@@ -1,7 +1,5 @@
 #include "builtins.h"
-#include "parser.h"
 
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -92,9 +90,8 @@ int pwdHandler(Command *cmd) {
 }
 
 int echoHandler(Command *cmd) {
-  char *output;
 
-  for (size_t i = 1; i < cmd->argc; i++) {
+  for (int i = 1; i < cmd->argc; i++) {
     printf("%s ", cmd->argv[i]);
   }
 
