@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "builtins.h"
+#include "ls.h"
 #include "parser.h"
 #include "utils.h"
 
@@ -38,13 +39,12 @@ int main(void) {
   while (1) {
 
     if (getCurrentWorkingDirectory(currentWorkingDir,
-                                   sizeof currentWorkingDir)) {
+                                   sizeof(currentWorkingDir))) {
       strcpy(currentWorkingDir, "?");
     }
 
     // Display shell prompt
     printf("%s@%s:%s> ", userName, systemName, currentWorkingDir);
-
     fflush(stdout);
 
     // Read user input dynamically
@@ -77,36 +77,50 @@ int main(void) {
     }
 
     if (strcmp(cmd.argv[0], "cd") == 0) {
+
       if (cdHandler(&cmd)) {
         fprintf(stderr, "Could Not cd now !!\n");
-        freeCommand(&cmd);
-        continue;
       }
+
     } else if (strcmp(cmd.argv[0], "pwd") == 0) {
+
       if (pwdHandler(&cmd)) {
         fprintf(stderr, "Could Not pwd now !!\n");
-        freeCommand(&cmd);
-        continue;
       }
+
     } else if (strcmp(cmd.argv[0], "echo") == 0) {
+
       if (echoHandler(&cmd)) {
         fprintf(stderr, "could Not Echo\n");
-        freeCommand(&cmd);
-        continue;
       }
+
+    } else if (strcmp(cmd.argv[0], "ls") == 0) {
+
+      if (lsHandler(&cmd)) {
+        fprintf(stderr, "Could Not execute ls\n");
+      }
+
     } else if (strcmp(cmd.argv[0], "exit") == 0) {
+
       if (cmd.argc > 1) {
         fprintf(stderr, "exit: Too Many Arguments\n");
+      } else {
+        printf("Shutting Down XO\n");
         freeCommand(&cmd);
-        continue;
+        break;
       }
-      printf("Shutting Down XO\n");
-      break;
+
+    } else {
+      fprintf(stderr, "%s: command not found\n", cmd.argv[0]);
     }
 
+    // Debug: print parsed arguments
+    // Remove this block when debugging is complete.
+    /*
     for (size_t i = 0; i < cmd.argc; i++) {
-      printf("argv[%zu] = %s\n", i, cmd.argv[i]);
+        printf("argv[%zu] = %s\n", i, cmd.argv[i]);
     }
+    */
 
     freeCommand(&cmd);
   }

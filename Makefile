@@ -5,9 +5,9 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
 
 TARGET = my_program
-SRCS = main.c utils.c parser.c builtin.c
+SRCS = main.c utils.c parser.c builtin.c ls.c
 OBJS = $(SRCS:.c=.o)
-HEADERS = utils.h parser.h builtins.h
+HEADERS = utils.h parser.h builtins.h ls.h
 
 all: $(TARGET)
 

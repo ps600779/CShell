@@ -1,0 +1,7 @@
+#include "parser.h"
+#include <dirent.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+
+int lsHandler(Command *cmd);

@@ -1,5 +1,6 @@
 #include "builtins.h"
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -91,7 +92,7 @@ int pwdHandler(Command *cmd) {
 
 int echoHandler(Command *cmd) {
 
-  for (int i = 1; i < cmd->argc; i++) {
+  for (size_t i = 1; i < cmd->argc; i++) {
     printf("%s ", cmd->argv[i]);
   }
 
